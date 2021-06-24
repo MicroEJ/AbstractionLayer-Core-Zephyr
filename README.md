@@ -39,10 +39,20 @@ Here is a non exhaustive list of tested environments:
 
 ## MISRA Compliance
 
-The implementation is MISRA-compliant (MISRA C 2004).
-| Deviation | Category |                                                 Justification                                                                     |
-|:---------:|:--------:|:---------------------------------------------------------------------------------------------------------------------------------:|
-| Rule 11.3 | Advisory | A deviation from this rule is necessary as the pointer returned by k_current_get has to be cast to an int32_t to get a task id    | 
+The implementation is MISRA-compliant (MISRA C 2012). It has been verified with cppcheck v2.4.1. 
+Here is the list of deviations:
+
+| Deviation | Category |   Action   |                                                 Justification                                                                     |
+|:---------:|:--------:|:----------:|:---------------------------------------------------------------------------------------------------------------------------------:|
+| Rule 11.3 | Advisory | Flagged    | A deviation from this rule is necessary as the pointer returned by k_current_get has to be cast to an int32_t to get a task id    |
+| Rule 5.5  | Required | Ignored    | A deviation from this rule is necessary as macros are used to map JVM symbols to LLMJVM_IMPL_ functions	               		   | 
+  
+## Usage
+
+Copy/paste source code in your platform BSP project or add the following line to your platform configuration `module.ivy`:
+> `<dependency org="com.microej.clibrary.llimpl" name="mjvm-zephyros" rev="..."/>`
+
+**_Note:_**  Run the [MicroEJ Core Validation](https://github.com/MicroEJ/PlatformQualificationTools/tree/master/tests/core/java/microej-core-validation) Platform Qualification Tools project to validate code integration in your environment.
 
 # Dependencies
 

@@ -6,7 +6,7 @@
 	Any modification of the source code will break MicroEJ Corp. warranties on the whole library.
 -->
 <ivy-module version="2.0" xmlns:ea="http://www.easyant.org"> 
-    <info organisation="com.microej.clibrary.llimpl" module="mjvm-zephyros" status="integration" revision="1.0.0">
+    <info organisation="com.microej.clibrary.llimpl" module="mjvm-zephyros" status="integration" revision="1.0.1">
         <ea:build organisation="com.is2t.easyant.buildtypes" module="build-custom" revision="1.+">
         	<ea:plugin org="com.is2t.easyant.plugins" module="artifact-checker" revision="1.7.+"/>
         </ea:build>

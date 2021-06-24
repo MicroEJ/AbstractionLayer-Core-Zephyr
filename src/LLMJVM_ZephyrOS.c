@@ -10,21 +10,16 @@
  * @file
  * @brief LLMJVM implementation over Zephyr OS.
  * @author MicroEJ Developer Team
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 /* Includes ------------------------------------------------------------------*/
 
-#include "misra_2004_conf.h"
-
-MISRA_2004_DISABLE_ALL
-#include <stdio.h>
 #include <zephyr.h>
 
 #include "LLMJVM_impl.h"
 #include "microej_time.h"
 #include "microej.h"
-MISRA_2004_ENABLE_ALL
 
 /* Defines -------------------------------------------------------------------*/
 
@@ -52,7 +47,7 @@ static void wake_up_timer_callback(struct k_timer *timer);
 
 static void wake_up_timer_callback(struct k_timer *timer) {
     if(&LLMJVM_zephyr_wake_up_timer == timer) {
-        LLMJVM_schedule();
+        (void) LLMJVM_schedule();
     }
 }
 
@@ -68,13 +63,19 @@ static void wake_up_timer_callback(struct k_timer *timer) {
  *  After its creation, the timer is idle. 
  */
 int32_t LLMJVM_IMPL_initialize(void) {
+	int32_t result;
+	
     k_timer_init(&LLMJVM_zephyr_wake_up_timer, wake_up_timer_callback, NULL);
 
-    k_sem_init(&LLMJVM_zephyr_semaphore, 0U, 1U);
-    
-    microej_time_init();
-
-    return LLMJVM_OK;
+    int retcode = k_sem_init(&LLMJVM_zephyr_semaphore, 0U, 1U);
+	if (0 == retcode) {
+		result = LLMJVM_OK;
+		
+		microej_time_init();
+	} else {
+		result = LLMJVM_ERROR;
+	}
+    return result;
 }
 
 /* 
@@ -88,20 +89,18 @@ int32_t LLMJVM_IMPL_vmTaskStarted(void) {
  * Schedules requests from the VM 
  */
 int32_t LLMJVM_IMPL_scheduleRequest(int64_t absoluteTime) {
-	int64_t relativeTime;
-	int64_t currentTime;
-    int32_t result = LLMJVM_OK; 
+    int32_t result = LLMJVM_OK;
+    int64_t currentTime = LLMJVM_IMPL_getCurrentTime(MICROEJ_TRUE);
+    int64_t relativeTime = absoluteTime - currentTime;
+    int64_t relativeTick = microej_time_time_to_tick(relativeTime);
 
-    currentTime = LLMJVM_IMPL_getCurrentTime(MICROEJ_TRUE);
-    relativeTime = absoluteTime - currentTime;
-
-    if(relativeTime <= 0) {
+    if(relativeTick <= 0) {
         LLMJVM_zephyr_next_wake_up_time = INT64_MAX;
 
         k_timer_stop(&LLMJVM_zephyr_wake_up_timer);
 
         result = LLMJVM_schedule();
-    } else if((k_timer_status_get(&LLMJVM_zephyr_wake_up_timer) > 0) 	|| 
+    } else if((k_timer_status_get(&LLMJVM_zephyr_wake_up_timer) > 0U) 	|| 
 	   (absoluteTime < LLMJVM_zephyr_next_wake_up_time) 		|| 
 	   (LLMJVM_zephyr_next_wake_up_time <= currentTime)) {
         /* Save new alarm absolute time */
@@ -112,7 +111,6 @@ int32_t LLMJVM_IMPL_scheduleRequest(int64_t absoluteTime) {
     } else {
 		/* else: there is a pending request that will occur before the new one -> do nothing */
 	}
-    
     return result;
 }
 
@@ -120,10 +118,12 @@ int32_t LLMJVM_IMPL_scheduleRequest(int64_t absoluteTime) {
  * Suspends the VM task if the pending flag is not set 
  */
 int32_t LLMJVM_IMPL_idleVM(void) {
-	int32_t result = LLMJVM_OK;
+	int32_t result;
     if (k_sem_take(&LLMJVM_zephyr_semaphore, K_FOREVER) != 0) {
         result = LLMJVM_ERROR;
-    }
+    } else {
+		result = LLMJVM_OK;
+	}
 	return result;
 }
 
@@ -146,11 +146,10 @@ int32_t LLMJVM_IMPL_ackWakeup(void) {
 /* 
  * Gets the current task id 
  */
-MISRA_2004_ENABLE_ALL
 int32_t LLMJVM_IMPL_getCurrentTaskID(void) {
+	// cppcheck-suppress [misra-c2012-11.4]
     return (int32_t) k_current_get();
 }
-MISRA_2004_ENABLE_ALL
 
 /*
  * Sets application time
