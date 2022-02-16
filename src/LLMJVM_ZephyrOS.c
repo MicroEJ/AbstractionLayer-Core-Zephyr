@@ -1,16 +1,15 @@
 /*
  * C
  *
- * Copyright 2021 MicroEJ Corp. All rights reserved.
- * This library is provided in source code for use, modification and test, subject to license terms.
- * Any modification of the source code will break MicroEJ Corp. warranties on the whole library.
+ * Copyright 2021-2022 MicroEJ Corp. All rights reserved.
+ * Use of this source code is governed by a BSD-style license that can be found with this software.
  */
 
 /**
  * @file
  * @brief LLMJVM implementation over Zephyr OS.
  * @author MicroEJ Developer Team
- * @version 1.0.1
+ * @version 1.0.2
  */
 
 /* Includes ------------------------------------------------------------------*/
@@ -42,8 +41,6 @@ static struct k_timer LLMJVM_zephyr_wake_up_timer;
 static struct k_sem LLMJVM_zephyr_semaphore;
 
 /* Private functions ---------------------------------------------------------*/
-
-static void wake_up_timer_callback(struct k_timer *timer);
 
 static void wake_up_timer_callback(struct k_timer *timer) {
     if(&LLMJVM_zephyr_wake_up_timer == timer) {
