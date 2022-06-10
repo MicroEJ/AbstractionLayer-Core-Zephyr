@@ -9,7 +9,7 @@
  * @file
  * @brief LLMJVM implementation over Zephyr OS.
  * @author MicroEJ Developer Team
- * @version 1.0.2
+ * @version 1.1.0
  */
 
 /* Includes ------------------------------------------------------------------*/
