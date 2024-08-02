@@ -1,7 +1,7 @@
 <!--
 	Ant
 	
-	Copyright 2021-2022 MicroEJ Corp. All rights reserved.
+	Copyright 2021-2024 MicroEJ Corp. All rights reserved.
 	Use of this source code is governed by a BSD-style license that can be found with this software.
 -->
 <project name="com.microej.clibrary.llimpl;mjvm-zephyr" xmlns:ea="antlib:org.apache.easyant">
@@ -26,6 +26,11 @@
     	    	<not><equals arg1="${count.success.checked.cfiles}" arg2="${count.cfiles}"/></not>
     	    </condition>
     	</fail>
+    	
+    	<!-- Extract VEE Port .zip content in the target~/dependencies/ folder -->
+		<unzip dest="${target}/dependencies/">
+		 	<fileset dir="${dependencies.output.dir}" includes="*.zip" erroronmissingdir="false"/>
+		</unzip>
     </target>
 
 </project>
